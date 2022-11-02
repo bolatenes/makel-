@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Oct 26 13:14:43 2022
-
 @author: bolat
 """
 
@@ -28,7 +27,7 @@ class Spring:
                 
             return self.k
     
-    def spring_strengt(self,diameter):
+    def spring_strengt(self,plot = True):
         
         data = {"Material" : ["Music Wire","Oil-tempred Wire","Hard-drawn Wire","Chrome-vanadium","chrome silicone"],
                 "Size range down(mm)" : [0.1,0.5,0.7,0.8,1.6],
@@ -37,28 +36,67 @@ class Spring:
                 "Constant ,A(Mpa.mm^m)" : [2170,1880,1750,2000,200]}
         df = pd.DataFrame(data)
         
-        cevap = input("Default olarak Hard-drawn wire kullaniyorum degistirmek istiyormusun Y/n : \n")
-        secim = True
         
-        while(secim):
-            if(cevap == "n" or cevap == "N"):
-                self.material = df[["Material","Size range down(mm)","Size range up(mm)","Exponent, m","Constant ,A(Mpa.mm^m)"][2]]
-                
-                secim == False 
-                
-            elif(cevap == "y" or cevap == "Y"):
-                print(df[["Material","Size range down(mm)","Size range up(mm)"]])
-                mat_num = int(input("Yukaridaki tabloadan malzemeninin indexinu ver : \n"))
-                self.material = df[["Material","Size range down(mm)","Size range up(mm)","Exponent, m","Constant ,A(Mpa.mm^m)"][mat_num]]
-                
-                if(diameter >= self.material["Size range down(mm)"][mat_num] and diameter <=self.material["Size range up(mm)"][mat_num]):
-                    print("Verdigin diameter uygun \n")
+        
+        while(True):
+            cevap = input("Default olarak Hard-drawn wire kullaniyorum degistirmek istiyormusun (Y/N) :\n cikmak icin (q/Q) : \n")
+            
+            if((cevap == "y" or cevap == "Y") or (cevap == "N" or cevap == "n")):
+            
+                while(True):
+                    print("Cikmak icin (Q/q)")
+                    print(df["Material"])
+                    print("\nMalzeme secimini indexe gore yapin : ")
                     
-                    secim == False 
+                    mal_index = int(input("\n malzeme indexi : "))
+                    if(mal_index in [0,1,2,3,4]):
+                        print("Kullanilacak malzeme : {}".format(df["Material"][mal_index]))
+                        break
+                    else :
+                        continue    
+                break
+            elif(cevap == "q" or cevap == "Q"):
+                break 
+            else :
+                continue
+            
+            
+            ust_sinir = df["Size range down(mm)"][mal_index]
+            alt_sinir = df["Size range up(mm)"][mal_index]
+            Exp_m = df["Exponent, m"][mal_index]
+            Const_A = df["Constant ,A(Mpa.mm^m)"][mal_index]
+            
+            diameters = np.linspace(alt_sinir, ust_sinir,20)
+            s_ultimate = []
+            
+            for i in range(0,len(diameters)):
+                diameter = diameters[i]
+                s_ultimate.append(Const_A/(diameter**Exp_m))
                 
-                else : 
-                    
-                    secim == True
+            if(plot == True):
+                x = diameters.reshape((-1,1))
+                y = s_ultimate
+                
+                plt.plot(x,y)
+                plt.xlabel("Diameter")
+                plt.ylabel("Ultimate strength")
+                plt.title("A : {} m = {}".format(Const_A,Exp_m))
+                plt.xlim(0,18)
+                plt.ylim(0,3000)
+                plt.legend()
+                
+                plt.show()
+            
+            self.s_ultimate = s_ultimate
+            
+                
+                
+                
+            
+            
+            
+        
+
       
         
 
@@ -69,7 +107,7 @@ class k_value():
         pass
     
     
-    def ka(self,s,plot):
+    def ka(self,s,plot = False):
         
         x = np.array([0.4,0.6,0.8,1.0,1.2,1.4,1.6]).reshape((-1,1))
         y = np.array([1,0.74,0.7,0.67,0.65,0.63,0.62])
@@ -160,6 +198,23 @@ class k_value():
             return 1
         elif t>350 or t<500:
             return 0.5
-            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
